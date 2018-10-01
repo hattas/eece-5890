@@ -14,40 +14,32 @@
 %% Importing data
 clear; clc;
 breastcancer = importdata('data_breastcancer.mat');
-n = breastcancer.n; % number of examples
-d = breastcancer.d; % number of features
 X = breastcancer.X;
 Y = breastcancer.Y;
 clear('breastcancer');
 
 %% Logistic Regression
-X = [ones(n, 1) X]; % add 
-w = zeros(d + 1, 1); % initial weights
-wprev = Inf;
-eta = 0.0001;
+eta = 10e-5;
 lambda = 1000;
-nIterations = 0;
-norms = zeros(1000);
+maxIter = 1000;
 
-while norm(w - wprev) > 10e-5 && nIterations < 1000
-    wprev = w;
-    w = update(w, X, Y, eta, lambda);
-    nIterations = nIterations + 1;
-    norms(nIterations) = norm(w - wprev);
+%split = [.01 .02 .03 .125 .625 1];
+split = linspace(0.1,1, 30);
+nRandomSplits = 100;
+accuracy = zeros(length(split), nRandomSplits);
+for i = 1:length(split)
+    for j = 1:nRandomSplits
+        [xTrain, xTest, yTrain, yTest] = splitData(X, Y, split(i), 2/3);
+        w = getWeights(xTrain, yTrain, eta, lambda, maxIter);
+        p = predict(w, xTest);
+        accuracy(i,j) = mean(double(p == yTest));
+    end
 end
-
-Norm = norm(w - wprev)
-nIterations
-
-p = predict(w, X);
-
-fprintf('Train Accuracy: %f \n', mean(double(p == Y)));
-fprintf('Fraction of positives: %f \n', nnz(Y) / length(Y));
-
-plot(norms(1:nIterations))
-ylabel('||w(t+1)-w(t)||')
-xlabel('iteration')
-
+accuracy = mean(accuracy, 2);
+plot(split, accuracy, '-r.', 'linewidth', 1, 'markersize', 15);
+title('Learning Curve')
+xlabel('Portion of data used')
+ylabel('Test accuracy')
 
 
 
