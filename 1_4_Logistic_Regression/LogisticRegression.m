@@ -32,7 +32,7 @@ for i = 1:length(split)
         [xTrain, xTest, yTrain, yTest] = splitData(X, Y, split(i), 2/3);
         w = getWeights(xTrain, yTrain, eta, lambda, maxIter);
         p = predict(w, xTest);
-        accuracy(i,j) = mean(double(p == yTest));
+        accuracy(i,j) = mean(p == yTest);
     end
 end
 accuracy = mean(accuracy, 2);
