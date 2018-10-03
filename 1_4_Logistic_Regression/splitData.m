@@ -1,11 +1,10 @@
-function [xTrain, xTest, yTrain, yTest] = splitData(X, Y, split, trainRatio)
-    X = X(randperm(size(X, 1), round(split*size(X,1))), :);
-    n = size(X,1);
-    tf = false(n, 1);
-    tf(1:round(trainRatio * n)) = true;
-    tf = tf(randperm(n));
+function [xTrain, yTrain, xTest, yTest] = splitData(X, Y, trainRatio)
+    m = length(Y);
+    tf = false(m, 1);
+    tf(1:round(trainRatio * m)) = true;
+    tf = tf(randperm(m));
     xTrain = X(tf,:);
+    yTrain = Y(tf,:);
     xTest = X(~tf,:);
-    yTrain = Y(tf);
-    yTest = Y(~tf);
+    yTest = Y(~tf,:);
 end

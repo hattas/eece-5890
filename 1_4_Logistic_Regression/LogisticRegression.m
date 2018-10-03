@@ -13,23 +13,25 @@
 
 %% Importing data
 clear; clc;
-breastcancer = importdata('data_breastcancer.mat');
-X = breastcancer.X;
-Y = breastcancer.Y;
+bc = importdata('data_breastcancer.mat');
 clear('breastcancer');
 
 %% Logistic Regression
 eta = 10e-5;
-lambda = 1000;
+lambda = 0;
 maxIter = 1000;
 
-%split = [.01 .02 .03 .125 .625 1];
-split = linspace(0.1,1, 30);
-nRandomSplits = 100;
+split = [.01 .02 .03 .125 .625 1];
+%split = linspace(0.01,1, 10);
+nRandomSplits = 5;
 accuracy = zeros(length(split), nRandomSplits);
 for i = 1:length(split)
     for j = 1:nRandomSplits
-        [xTrain, xTest, yTrain, yTest] = splitData(X, Y, split(i), 2/3);
+        [X, Y] = randomizeOrder(bc.X, bc.Y);
+        [xTrain, yTrain, xTest, yTest] = splitData(X, Y, 2/3);
+        nTrainPoints = round(size(xTrain, 1)*split(i));
+        xTrain = xTrain(1:nTrainPoints, :);
+        yTrain = yTrain(1:nTrainPoints, :);
         w = getWeights(xTrain, yTrain, eta, lambda, maxIter);
         p = predict(w, xTest);
         accuracy(i,j) = mean(p == yTest);
