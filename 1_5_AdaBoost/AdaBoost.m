@@ -14,38 +14,36 @@
 clear; clc;
 bupa = importdata('data_bupa.mat');
 X = bupa.X;
-Y = bupa.Y; % {-1, 1}
+Y = bupa.Y;
 
-%% AdaBoost
-nIterations = 100;
-h = DecisionStump.empty(nIterations, 0);
-alpha = zeros(nIterations, 1);
-
-N = size(X, 1);
-D = ones(N, 1) / N; % importance vector starts as all equal
-
-for t = 1:nIterations
-    h(t) = DecisionStump();
-
-    h(t) = h(t).fit(X, Y, D);
-    Yhat = h(t).predict(X);
-    
-    epsilon = classificationError(Y, Yhat, D);
-    alpha(t) = 1/2 * log((1 - epsilon) / epsilon);
-
-    D = D .* exp(-alpha(t) * Y .* Yhat);
-    D = D / sum(D);
-    
-    if t <= 10
-        fprintf('t=%-2d\tj=%d\tc=%.1f\tC1=%+d\tC2=%+d\n',t,h(t).j,h(t).c,h(t).C1,h(t).C2)
-    end
-end
-
-H = zeros(N, 1);
-for t = 1:nIterations
-    H = H + alpha(t) * h(t).predict(X);
-end
-H = sign(H);
+%% Part 1:
+% Display selected feature, threshold, and class label for 1st 10 iterations
+nIterations = 10;
+[h, alpha] = trainAdaBoost(X, Y, nIterations, 1);
+H = predictAda(X, h, alpha);
 accuracy = mean(H == Y)
 
+%% Part 2
+% Use 90% training & 10% testing
+% Average over 50 random splits, use 100 iterations
+% Plot average training error & average test error vs boosting iteration
+nRandomSplits = 50;
+nIterations = 100;
+trainingError = zeros(nRandomSplits, nIterations);
+testError = zeros(nRandomSplits, nIterations);
+for i = 1:nRandomSplits
+    [X, Y] = randomizeOrder(bupa.X, bupa.Y);
+    [xTrain, yTrain, xTest, yTest] = splitData(X, Y, 2/3);
+    [h, alpha] = trainAdaBoost(xTrain, yTrain, nIterations);
+    for t = 1:nIterations
+        trainingError(i, t) = mean(yTrain ~= predictAda(xTrain, h(1:t), alpha(1:t)));
+        testError(i, t) = mean(yTest ~= predictAda(xTest, h(1:t), alpha(1:t)));
+    end
+end
+avgTrainingError = mean(trainingError, 1);
+avgTestError = mean(testError, 1);
+
+plot(1:nIterations, avgTrainingError)
+hold on
+plot(1:nIterations, avgTestError)
 
