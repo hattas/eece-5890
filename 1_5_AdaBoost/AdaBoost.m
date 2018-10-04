@@ -43,7 +43,10 @@ end
 avgTrainingError = mean(trainingError, 1);
 avgTestError = mean(testError, 1);
 
-plot(1:nIterations, avgTrainingError)
+plot(1:nIterations, avgTrainingError, 'linewidth', 1)
 hold on
-plot(1:nIterations, avgTestError)
-
+plot(1:nIterations, avgTestError, 'linewidth', 1)
+xlabel('number of boosting iterations')
+ylabel('average error')
+legend('training', 'test')
+title('Error vs. Number of Boosting Iterations')

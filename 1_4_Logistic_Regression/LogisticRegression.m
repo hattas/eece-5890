@@ -21,9 +21,9 @@ lambda = 0;
 maxIter = 1000;
 
 %% Random split testing
-%split = [.01 .02 .03 .125 .625 1];
+split = [.01 .02 .03 .125 .625 1];
 split = logspace(-2, 0, 20);
-nRandomSplits = 5;
+nRandomSplits = 150;
 accuracy = zeros(length(split), nRandomSplits);
 for i = 1:length(split)
     for j = 1:nRandomSplits
@@ -42,7 +42,7 @@ accuracy = mean(accuracy, 2);
 %% Plot the learning curve
 plot(split, accuracy, '-r.', 'linewidth', 1, 'markersize', 15);
 title('Learning Curve')
-xlabel('Portion of data used')
+xlabel('Fraction of training data used')
 ylabel('Test accuracy')
 
 
