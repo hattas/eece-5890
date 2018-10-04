@@ -14,15 +14,15 @@
 %% Importing data
 clear; clc;
 bc = importdata('data_breastcancer.mat');
-clear('breastcancer');
 
-%% Logistic Regression
+%% User parameters
 eta = 10e-5;
 lambda = 0;
 maxIter = 1000;
 
-split = [.01 .02 .03 .125 .625 1];
-%split = linspace(0.01,1, 10);
+%% Random split testing
+%split = [.01 .02 .03 .125 .625 1];
+split = logspace(-2, 0, 20);
 nRandomSplits = 5;
 accuracy = zeros(length(split), nRandomSplits);
 for i = 1:length(split)
@@ -38,6 +38,8 @@ for i = 1:length(split)
     end
 end
 accuracy = mean(accuracy, 2);
+
+%% Plot the learning curve
 plot(split, accuracy, '-r.', 'linewidth', 1, 'markersize', 15);
 title('Learning Curve')
 xlabel('Portion of data used')
