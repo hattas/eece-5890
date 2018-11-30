@@ -1,14 +1,15 @@
 load('digits.mat')
 Xbar = mean(X);
 Xc = X - Xbar;
-[V,D] = eig(cov(Xc));
+sigma = cov(Xc);
+[V,D] = eig(sigma);
 V = fliplr(V); % sort descending
 
 %% Part 1: Plot the first 9 principal components as images
 figure(1)
 for i=1:9
     subplot(3,3,i)
-    plotDigit(V(:,i), true);
+    plotDigit(V(:,i));
     title(['PC' num2str(i)]);
 end
 
